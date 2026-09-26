@@ -1,6 +1,10 @@
+import json
+
 import requests
 import pandas as pd
 from urllib.parse import quote
+
+import argparse
 
 def get_language_articles(
     title: str,
@@ -72,9 +76,61 @@ def fetch_data_page(
                 results[f"{lang}_{article}"] = {"error": response.status_code, "message": response.text}
     return results
 
-def analyze_data(data:dict) -> dict:
+def prepare_data(data: dict) -> dict:
     analyzed_results = pd.DataFrame(data["items"])
     analyzed_results["date"] = pd.to_datetime(analyzed_results["timestamp"], format="%Y%m%d%H")
-    
-    
     return analyzed_results
+
+def calculate_statistics(dataframe: pd.DataFrame) -> dict:
+    views = dataframe["views"]
+
+    first_period = views.iloc[:24].mean()
+    last_period = views.iloc[-24:].mean()
+
+    return {
+        "observations": len(dataframe),
+        "total_views": int(views.sum()),
+        "average_views": float(views.mean()),
+        "median_views": float(views.median()),
+        "minimum_views": int(views.min()),
+        "maximum_views": int(views.max()),
+        "std_views": float(views.std()),
+        "volatility": float(views.std() / views.mean()),
+        "growth_percent": float(
+            (last_period - first_period) / first_period * 100
+        ),
+        "peak": {
+            "date": dataframe.loc[views.idxmax(), "date"].isoformat(),
+            "views": int(views.max()),
+        },
+        "missing_values": int(dataframe["views"].isna().sum()),
+    }
+    
+def detect_anomalies(dataframe: pd.DataFrame) -> list[dict]:
+    views = dataframe["views"]
+
+    z_score = (views - views.mean()) / views.std()
+
+    anomalies = dataframe[z_score.abs() > 3]
+
+    return [
+        {
+            "date": row["date"].isoformat(),
+            "views": int(row["views"]),
+        }
+        for _, row in anomalies.iterrows()
+    ]
+    
+def analyze_data(data: dict) -> dict:
+    dataframe = prepare_data(data)
+
+    return {
+        "statistics": calculate_statistics(dataframe),
+        "anomalies": detect_anomalies(dataframe),
+        "time_series": dataframe[["date", "views"]].to_dict("records"),
+    }
+    
+def save_to_json(data: dict, output_file: str = "output.json") -> None:
+    with open(output_file, "w") as f:
+        json.dump(data, f, indent=4)
+
