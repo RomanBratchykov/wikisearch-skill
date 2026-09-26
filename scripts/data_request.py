@@ -6,22 +6,30 @@ def fetch_data_page(
     start_date: str,
     end_date: str,
     granularity: str = "daily",
-    access_token: str = "all_access",
+    access_token: str = "all-access",
 )-> dict:
-    url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+    url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
     results = {}
     for lang in languages:
         for article in articles:
-            params = {
-                "project": f"{lang}.wikipedia.org",
-                "access": access_token,
-                "agent": "user",
-                "article": article,
-                "granularity": granularity,
-                "start": start_date,
-                "end": end_date
-            }
-            response = requests.get(url, params=params)
+            url += (
+                #project
+                f"{lang}.wikipedia.org"
+                #access token
+                f"/{access_token}/"
+                #agent
+                f"user/"
+                #article
+                f"{article}/"
+                #granularity
+                f"{granularity}/"
+                #start date
+                f"{start_date}/"
+                #end date
+                f"{end_date}"
+            )     
+            print(url)      
+            response = requests.get(url)
             if response.status_code == 200:
                 results[f"{lang}_{article}"] = response.json()
             else:
@@ -32,3 +40,12 @@ def analyze_data(data:dict) -> dict:
     analyzed_results = {}
     
     return analyzed_results
+
+if __name__ == "__main__":
+    languages = ["en"]
+    articles = ["Python_(programming_language)", "Artificial_intelligence"]
+    start_date = "20220101"
+    end_date = "20220131"
+    
+    data = fetch_data_page(languages, articles, start_date, end_date)
+    print(data)
