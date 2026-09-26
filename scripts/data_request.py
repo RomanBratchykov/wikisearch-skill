@@ -5,14 +5,16 @@ def fetch_data_page(
     articles: list[str],
     start_date: str,
     end_date: str,
-    granularity: str = "daily",
+    granularity: str = "monthly",
     access_token: str = "all-access",
 )-> dict:
-    url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
     results = {}
+    headers = {"User-Agent": "wikisearch-skill/1.0 (https://github.com/RomanBratchykov/wikisearch-skill)"}
     for lang in languages:
         for article in articles:
+            url = ""
             url += (
+                f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
                 #project
                 f"{lang}.wikipedia.org"
                 #access token
@@ -29,7 +31,7 @@ def fetch_data_page(
                 f"{end_date}"
             )     
             print(url)      
-            response = requests.get(url)
+            response = requests.get(url, headers=headers)
             if response.status_code == 200:
                 results[f"{lang}_{article}"] = response.json()
             else:
