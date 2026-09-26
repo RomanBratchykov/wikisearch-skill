@@ -1,4 +1,37 @@
 import requests
+import pandas as pd
+from urllib.parse import quote
+
+def get_language_articles(
+    title: str,
+    languages: list[str],
+) -> dict[str, str]:
+    encoded_title = quote(title, safe="")
+    
+    url = (
+        f"https://en.wikipedia.org/w/rest.php/v1/"
+        f"page/{encoded_title}/links/language"
+    )
+    
+    headers = {
+        "User-Agent": (
+            "wikisearch-skill/1.0 "
+            "(https://github.com/RomanBratchykov/wikisearch-skill)"
+        )
+    }
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    data = response.json()
+
+    articles = {}
+
+    for item in data:
+        if item["code"] in languages:
+            articles[item["code"]] = item["title"]
+
+    return articles
 
 def fetch_data_page(
     languages: list[str],
@@ -9,6 +42,7 @@ def fetch_data_page(
     access_token: str = "all-access",
 )-> dict:
     results = {}
+    
     headers = {"User-Agent": "wikisearch-skill/1.0 (https://github.com/RomanBratchykov/wikisearch-skill)"}
     for lang in languages:
         for article in articles:
@@ -39,15 +73,8 @@ def fetch_data_page(
     return results
 
 def analyze_data(data:dict) -> dict:
-    analyzed_results = {}
+    analyzed_results = pd.DataFrame(data["items"])
+    analyzed_results["date"] = pd.to_datetime(analyzed_results["timestamp"], format="%Y%m%d%H")
+    
     
     return analyzed_results
-
-if __name__ == "__main__":
-    languages = ["en"]
-    articles = ["Python_(programming_language)", "Artificial_intelligence"]
-    start_date = "20220101"
-    end_date = "20220131"
-    
-    data = fetch_data_page(languages, articles, start_date, end_date)
-    print(data)
