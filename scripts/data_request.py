@@ -6,8 +6,8 @@ import pandas as pd
 from urllib.parse import quote
 
 import argparse
-from scripts.graph_builder import build_graph
-from scripts.pdf_converter import convert_to_pdf
+from graph_builder import build_graph
+from pdf_converter import convert_to_pdf
 
 def get_language_articles(
     article: str,

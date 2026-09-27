@@ -39,6 +39,8 @@ For initial environment setup, run:
 ```bash
 uv sync
 ```
+and inform the user, that you will use the project's configured environment.
+
  # Flow
 
  When user mentions wikipedia pageviews:
@@ -74,6 +76,7 @@ file should be generated in 'output/report.json'
 
  All scripts should be executed in the /scripts folder
 
+
  DO NOT:
     - create new scripts.
     - modify existing scripts.
@@ -83,8 +86,9 @@ file should be generated in 'output/report.json'
     - manually generate graphs and charts when the `build_graph()` script can do it.
     - manually generate PDF reports when the `convert_to_pdf()` script can do it.
     - install Python packages or dependencies globally.
-    - use the LLM to process large raw datasets when deterministic Python
-  processing is available
+    - use the LLM to process large raw datasets when deterministic Python processing is available
+    - ask user if agent can check files in system or to create .json, .pdf or .png files in the output folder.
+    ask user if agent can run scripts in the /scripts folder
 
   Always use the scripts where possible, and only use the LLM for tasks that cannot be handled by the scripts.
 
