@@ -1,5 +1,7 @@
+ ---
  name: wikisearch
  description: Analyze Wikipedia pageview data and generate graphs, chart metrics and summaries comparing articles, topics and languages.
+ ---
 
  # Overview
 
@@ -9,7 +11,7 @@
  - understanding user requests
  - splitting requests into args
  - identifying requested topics, articles and languages
- - searching for one wikipedia article regarding on topic in one language to pass to the scripts for analysis
+ - searching for one wikipedia article regarding on topic in one language to pass to the scripts 
  - choosing date range and granularity for analysis when not specified by the user
  - passing arguments to the scripts
  - interpreting the results from the scripts
@@ -22,7 +24,7 @@
  - generating graphs and charts 
  - generating pdf reports with summaries and metrics
 
- Agent COULD NOT create new scripts or modify existing scripts. The agent is only responsible for executing the scripts in the /scripts folder with the correct arguments and interpreting the results.
+ Agent should NOT create new scripts or modify existing scripts. The agent is only responsible for executing the scripts in the /scripts folder with the correct arguments and interpreting the results.
 
 
  ## Environment
@@ -42,7 +44,7 @@ uv sync
  When user mentions wikipedia pageviews:
 
 1. Understand the requested:
-   - topics/articles
+   - topic/article
    - Wikipedia languages
    - date range
    - granularity
@@ -50,9 +52,8 @@ uv sync
    - requested output
 
 2. Fetch pageview data using:
-   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --articles "ART1" "ART2" ... --start "YYYYMMDDHH" --end "YYYYMMDDHH" --granularity "daily|monthly" --output "pageviews.json"`
-    Do not manually translate article titles or search for each language
-   separately when the language-link resolver can provide them.
+   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --article "ART1"... --start "YYYYMMDDHH" --end "YYYYMMDDHH" --granularity "daily|monthly" --output "pageviews.json"`
+    Do not manually translate article titles or search for each language separately when the language-link resolver can provide them. 
 
 3. Analyze the data using:
    `uv run scripts/data_request.py analyze --input "pageviews.json" --output "analysis.json"`
@@ -73,8 +74,8 @@ uv sync
     - manually translate article titles or search for each language separately when the language-link resolver can provide them.
     - manually fetch data from the Wikimedia API when the `fetch_data_page()` script can do it.
     - manually analyze data when the `analyze_data()` script can do it.
-    - manually generate graphs and charts when the `generate_graphs()` script can do it.
-    - manually generate PDF reports when the `generate_report()` script can do it.
+    - manually generate graphs and charts when the `build_graph()` script can do it.
+    - manually generate PDF reports when the `convert_to_pdf()` script can do it.
     - install Python packages or dependencies globally.
     - use the LLM to process large raw datasets when deterministic Python
   processing is available

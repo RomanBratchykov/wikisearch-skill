@@ -7,14 +7,14 @@ from urllib.parse import quote
 import argparse
 
 def get_language_articles(
-    title: str,
+    article: str,
     languages: list[str],
 ) -> dict[str, str]:
-    encoded_title = quote(title, safe="")
+    encoded_article = quote(article, safe="")
     
     url = (
         f"https://en.wikipedia.org/w/rest.php/v1/"
-        f"page/{encoded_title}/links/language"
+        f"page/{encoded_article}/links/language"
     )
     
     headers = {
@@ -32,8 +32,8 @@ def get_language_articles(
     articles = {}
 
     for item in data:
-        if item["code"] in languages:
-            articles[item["code"]] = item["title"]
+        if item["lang"] in languages:
+            articles[item["lang"]] = item["article"]
 
     return articles
 
@@ -42,13 +42,13 @@ def fetch_data_page(
     article: str,
     start_date: str,
     end_date: str,
-    granularity: str = "daily",
+    granularity: str,
     access_token: str = "access",
 )-> dict:
     results = {}
     articles = get_language_articles(article, languages)
     headers = {"User-Agent": "wikisearch-skill/1.0 (https://github.com/RomanBratchykov/wikisearch-skill)"}
-    for article, lang in articles.items():
+    for lang, article in articles.items():
             url = ""
             url += (
                 f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
@@ -72,8 +72,7 @@ def fetch_data_page(
             if response.status_code == 200:
                 results[f"{lang}_{article}"] = response.json()
             else:
-                results[f"{lang}_{article}"] = {"error": response.status_code, "message": response.text}
-    save_to_json(results, "pageviews.json")
+                continue
     return results
 
 def prepare_data(data: dict) -> pd.DataFrame:
@@ -81,11 +80,20 @@ def prepare_data(data: dict) -> pd.DataFrame:
     analyzed_results["date"] = pd.to_datetime(analyzed_results["timestamp"], format="%Y%m%d%H")
     return analyzed_results
 
-def calculate_statistics(dataframe: pd.DataFrame) -> dict:
+def calculate_statistics(dataframe: pd.DataFrame, granularity: str) -> dict:
     views = dataframe["views"]
+   
+    if granularity == "daily":
+        period_size = 24 * 30      
 
-    first_period = views.iloc[:24].mean()
-    last_period = views.iloc[-24:].mean()
+    elif granularity == "monthly":
+        period_size = 12            
+
+    else:
+        raise ValueError(f"Unsupported granularity: {granularity}")
+
+    first_period = views.iloc[:period_size].mean()
+    last_period = views.iloc[-period_size:].mean()
 
     return {
         "observations": len(dataframe),
@@ -127,7 +135,7 @@ def analyze_data(data: dict) -> dict:
         dataframe = prepare_data(article_data)
         
         results[key] = {
-        "statistics": calculate_statistics(dataframe),
+        "statistics": calculate_statistics(dataframe, article_data.get("granularity", "daily")),
         "anomalies": detect_anomalies(dataframe),
         "time_series": [
                 {
@@ -152,10 +160,10 @@ def main():
 
     fetch_parser = subparsers.add_parser("fetch")
     fetch_parser.add_argument("--languages", nargs="+", required=True)
-    fetch_parser.add_argument("--articles", nargs="+", required=True)
-    fetch_parser.add_argument("--start", required=True)
-    fetch_parser.add_argument("--end", required=True)
-    fetch_parser.add_argument("--granularity", default="monthly")
+    fetch_parser.add_argument("--article", required=True)
+    fetch_parser.add_argument("--start", required=True, help="Start date in YYYYMMDDHH format")
+    fetch_parser.add_argument("--end", required=True, help="End date in YYYYMMDDHH format")
+    fetch_parser.add_argument("--granularity", default="daily")
     fetch_parser.add_argument("--output", default="pageviews.json")
     
     analyze_parser = subparsers.add_parser("analyze")
@@ -166,9 +174,9 @@ def main():
     if args.command == "fetch":
         result = fetch_data_page(
             args.languages,
-            args.articles,
+            args.article,
             args.start,
-            args.end, 
+            args.end,
             args.granularity,
         )
         save_to_json(result, args.output)

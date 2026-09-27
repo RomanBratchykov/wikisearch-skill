@@ -1,5 +1,4 @@
 import argparse
-
 import json
 import reportlab as rl
 from reportlab.lib.pagesizes import letter
