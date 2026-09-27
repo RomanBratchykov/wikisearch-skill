@@ -39,14 +39,14 @@ def get_language_articles(
 
 def fetch_data_page(
     languages: list[str],
-    articles: list[str],
+    article: str,
     start_date: str,
     end_date: str,
     granularity: str = "monthly",
     access_token: str = "all-access",
 )-> dict:
     results = {}
-    
+    articles = get_language_articles(article, languages)
     headers = {"User-Agent": "wikisearch-skill/1.0 (https://github.com/RomanBratchykov/wikisearch-skill)"}
     for lang in languages:
         for article in articles:
@@ -74,6 +74,7 @@ def fetch_data_page(
                 results[f"{lang}_{article}"] = response.json()
             else:
                 results[f"{lang}_{article}"] = {"error": response.status_code, "message": response.text}
+    save_to_json(results, "pageviews.json")
     return results
 
 def prepare_data(data: dict) -> dict:
@@ -121,14 +122,17 @@ def detect_anomalies(dataframe: pd.DataFrame) -> list[dict]:
         for _, row in anomalies.iterrows()
     ]
     
-def analyze_data(data: dict) -> dict:
-    dataframe = prepare_data(data)
-
-    return {
+def analyze_data(data: dict) -> None:
+    results = {}
+    for key, article_data in data.items():
+        dataframe = prepare_data(article_data)
+        
+        results[key] = {
         "statistics": calculate_statistics(dataframe),
         "anomalies": detect_anomalies(dataframe),
         "time_series": dataframe[["date", "views"]].to_dict("records"),
-    }
+        }
+    save_to_json(results, "analysis.json")
     
 def save_to_json(data: dict, output_file: str = "output.json") -> None:
     with open(output_file, "w") as f:
@@ -156,11 +160,6 @@ def main():
     analyze_parser = subparsers.add_parser("analyze")
     analyze_parser.add_argument("--input", required=True)
     analyze_parser.add_argument("--output", default="analysis.json")
-    
-    prepare_parser = subparsers.add_parser("prepare")
-    prepare_parser.add_argument("--input", required=True)
-    prepare_parser.add_argument("--output", default="prepared_data.json")
-
     args = parser.parse_args()
 
     if args.command == "resolve":
@@ -185,12 +184,6 @@ def main():
             data = json.load(f)
         result = analyze_data(data)
         save_to_json(result, args.output)
-        print(f"Saved to {args.output}")
-    elif args.command == "prepare":
-        with open(args.input, "r") as f:
-            data = json.load(f)
-        result = prepare_data(data)
-        save_to_json(result.to_dict("records"), args.output)
         print(f"Saved to {args.output}")
 
 

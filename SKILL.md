@@ -49,30 +49,18 @@ uv sync
    - comparison criteria
    - requested output
 
-2. Resolve Wikipedia article titles using the existing
-   `data_request` implementation.
-
-   Use:
-   `uv run scripts/data_request.py resolve --title "ARTICLE_TITLE" --languages "LANG1" "LANG2" ...`
-
+2. Fetch pageview data using:
+   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --articles "ART1" "ART2" ... --start "YYYY-MM-DD" --end "YYYY-MM-DD" --granularity "daily|monthly" --output "pageviews.json"`
    Do not manually translate article titles or search for each language
    separately when the language-link resolver can provide them.
 
-3. Fetch pageview data using:
-   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --articles "ART1" "ART2" ... --start "YYYY-MM-DD" --end "YYYY-MM-DD" --granularity "daily|monthly" --output "pageviews.json"`
+3. Analyze the data using:
+   `uv run scripts/data_request.py analyze --input "pageviews.json" --output "analysis.json"`
 
-
-4. Prepare the data using:
-   `uv run scripts/data_request.py prepare --input "analysis.json" --output "prepared_data.json"`
-
-
-5. Analyze the data using:
-   `uv run scripts/data_request.py analyze --input "prepared_data.json" --output "analysis.json"`
-
-6. If requested, generate graphs and charts using:
+4. If requested, generate graphs and charts using:
    `uv run scripts/output/graph_builder.py --input "analysis.json" --output "graph.png" --title "Pageviews" --xlabel "Date" --ylabel "Views"`
 
-7. If requested, generate a PDF report with summaries and metrics using:
+5. If requested, generate a PDF report with summaries and metrics using:
    `uv run scripts/output/pdf_converter.py --input "analysis.json" --output "report.pdf"`
 
  #Execution rules
