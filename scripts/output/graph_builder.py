@@ -44,3 +44,6 @@ def main():
     build_graph(data, args.title, args.xlabel, args.ylabel, args.output)
     print(f"Graph saved to {args.output}")
     
+if __name__ == "__main__":
+    main()
+    

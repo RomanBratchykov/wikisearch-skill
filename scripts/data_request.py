@@ -92,8 +92,8 @@ def calculate_statistics(dataframe: pd.DataFrame) -> dict:
         "total_views": int(views.sum()),
         "average_views": float(views.mean()),
         "median_views": float(views.median()),
-        "minimum_views": int(views.min()),
-        "maximum_views": int(views.max()),
+        "min_views": int(views.min()),
+        "max_views": int(views.max()),
         "std_views": float(views.std()),
         "volatility": float(views.std() / views.mean()),
         "growth_percent": float(

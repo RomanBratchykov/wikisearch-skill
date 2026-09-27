@@ -5,7 +5,7 @@
 
  This skill analyzes Wikipedia pageview data.
 
- Agent responcible for:
+ Agent responsible for:
  - understanding user requests
  - splitting requests into args
  - identifying requested topics, articles and languages
@@ -67,13 +67,13 @@ uv sync
 
 
 5. Analyze the data using:
-   `uv run scripts/data_request.py analyze --input "pageviews.json" --output "analysis.json"`
+   `uv run scripts/data_request.py analyze --input "prepared_data.json" --output "analysis.json"`
 
 6. If requested, generate graphs and charts using:
    `uv run scripts/output/graph_builder.py --input "analysis.json" --output "graph.png" --title "Pageviews" --xlabel "Date" --ylabel "Views"`
 
 7. If requested, generate a PDF report with summaries and metrics using:
-   `uv run scripts/output/report_generator.py --input "analysis.json" --output "report.pdf" --title "Wikipedia Pageviews Report"`
+   `uv run scripts/output/pdf_converter.py --input "analysis.json" --output "report.pdf"`
 
  #Execution rules
 

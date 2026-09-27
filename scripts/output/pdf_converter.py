@@ -36,8 +36,9 @@ def convert_to_pdf(data: dict, output_file: str) -> None:
         y_position -= 20
 
     c.save()
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+def main():
+    
+    parser = argparse.ArgumentParser(description="Convert Wikipedia pageview data to PDF")
 
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
@@ -47,3 +48,5 @@ if __name__ == "__main__":
     data = json.load(open(args.input, "r"))
 
     convert_to_pdf(data, args.output)
+if __name__ == "__main__":
+    main()
