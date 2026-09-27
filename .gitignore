@@ -1,0 +1,9 @@
+output/analysis.json
+output/charts.png
+output/pageviews.json
+output/report.json
+output/report.pdf
+scripts/analysis.json
+scripts/__pycache__/data_request.cpython-314.pyc
+scripts/__pycache__/graph_builder.cpython-314.pyc
+scripts/__pycache__/pdf_converter.cpython-314.pyc
