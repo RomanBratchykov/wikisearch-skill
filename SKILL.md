@@ -1,13 +1,18 @@
- ---
- name: wikisearch
+---
+ name: wikisearch-skill
  description: Analyze Wikipedia pageview data and generate graphs, chart metrics and summaries comparing articles, topics and languages.
- ---
+ allowed-tools:
+   - Bash(rtk ls:*)
+   - Bash(uv sync:*)
+   - Bash(rtk uv run:*)
+---
 
  # Overview
 
  This skill analyzes Wikipedia pageview data.
 
  Agent responsible for:
+ - searhing of files in the skills folder
  - understanding user requests
  - splitting requests into args
  - identifying requested topics, articles and languages
@@ -15,7 +20,13 @@
  - choosing date range and granularity for analysis when not specified by the user
  - passing arguments to the scripts
  - interpreting the results from the scripts
- - using the scripts for analysis based on user requests
+ - using the scripts for analysis based on user requests without asking for permission
+ -creating json summary of output/analysis.json to be used for pdf and graph generation with LLM to summarize the data and generate metrics. The report should include:
+   - Summary of pageviews for each article and language
+   - Comparison metrics based on user-specified criteria
+   - Any notable trends or insights
+   - file should be generated in 'output/report.json'
+
 
   Scripts responsible for:
  - finding names of articles in different languages
@@ -67,10 +78,10 @@ and inform the user, that you will use the project's configured environment.
 file should be generated in 'output/report.json'
 
 5. If requested, generate a PDF report with summaries and metrics using:
-   `uv run scripts/output/pdf_converter.py --input "output/report.json" --output "output/report.pdf"`
+   `uv run scripts/pdf_converter.py --input "output/report.json" --output "output/report.pdf"`
    
 6. If requested, generate graphs and charts using:
-   `uv run scripts/output/graph_builder.py --input "output/report.json" --output "output/graphs.png"`
+   `uv run scripts/graph_builder.py --input "output/report.json" --output "output/graphs.png"`
 
  #Execution rules
 
