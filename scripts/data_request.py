@@ -87,16 +87,28 @@ def calculate_statistics(dataframe: pd.DataFrame, granularity: str) -> dict:
     views = dataframe["views"]
    
     if granularity == "daily":
-        period_size = 24 * 30      
+        period_size = 30      
 
     elif granularity == "monthly":
-        period_size = 12            
+        period_size = 3            
 
     else:
         raise ValueError(f"Unsupported granularity: {granularity}")
 
-    first_period = views.iloc[:period_size].mean()
-    last_period = views.iloc[-period_size:].mean()
+    if len(dataframe) < 2 * period_size:
+        period_size = len(dataframe) // 2
+
+    if period_size == 0:
+        growth_percent = None
+    else:
+        first_period = views.iloc[:period_size].mean()
+        last_period = views.iloc[-period_size:].mean()
+        if first_period == 0 or pd.isna(first_period):
+            growth_percent = None
+        else:
+            growth_percent = float(
+                (last_period - first_period) / first_period * 100
+            )
 
     return {
         "observations": len(dataframe),
@@ -107,9 +119,7 @@ def calculate_statistics(dataframe: pd.DataFrame, granularity: str) -> dict:
         "max_views": int(views.max()),
         "std_views": float(views.std()),
         "volatility": float(views.std() / views.mean()),
-        "growth_percent": float(
-            (last_period - first_period) / first_period * 100
-        ),
+        "growth_percent": growth_percent,
         "peak": {
             "date": dataframe.loc[views.idxmax(), "date"].isoformat(),
             "views": int(views.max()),
