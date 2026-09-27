@@ -3,7 +3,21 @@
 Analyzes Wikipedia pageview data: fetches views per article/language,
 computes stats, detects anomalies, and can render charts and a one-page
 PDF report.
- 
+
+# Installation
+
+use 
+```bash
+curl -fsSL https://raw.githubusercontent.com/RomanBratchykov/wikisearch-skill/main/install.sh | bash
+```
+or
+```bash
+git clone https://github.com/RomanBratchykov/wikisearch-skill.git
+cd wikisearch-skill
+uv sync
+```
+
+
 ## How it works
  
 1. **fetch** — resolves the article's title in each requested language
