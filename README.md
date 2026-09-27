@@ -8,7 +8,7 @@ PDF report.
 
 use 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RomanBratchykov/wikisearch-skill/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/RomanBratchykov/wikisearch-skill/install.sh | bash
 ```
 or
 ```bash
