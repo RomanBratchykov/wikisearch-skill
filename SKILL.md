@@ -52,17 +52,23 @@ uv sync
    - requested output
 
 2. Fetch pageview data using:
-   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --article "ART1"... --start "YYYYMMDDHH" --end "YYYYMMDDHH" --granularity "daily|monthly" --output "pageviews.json"`
+   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --article "ART1"... --start "YYYYMMDDHH" --end "YYYYMMDDHH" --granularity "daily|monthly" --output "output/pageviews.json"`
     Do not manually translate article titles or search for each language separately when the language-link resolver can provide them. 
 
 3. Analyze the data using:
-   `uv run scripts/data_request.py analyze --input "pageviews.json" --output "analysis.json"`
+   `uv run scripts/data_request.py analyze --input "output/pageviews.json" --output "output/analysis.json"`
 
-4. If requested, generate graphs and charts using:
-   `uv run scripts/output/graph_builder.py --input "analysis.json" --output "graph.png" --title "Pageviews" --xlabel "Date" --ylabel "Views"`
+4. Based on the 'output/analysis.json' generate json report that can be used both on pdf and graph generation using LLM to summarize the data and generate metrics. The report should include:
+   - Summary of pageviews for each article and language
+   - Comparison metrics based on user-specified criteria
+   - Any notable trends or insights
+file should be generated in 'output/report.json'
 
 5. If requested, generate a PDF report with summaries and metrics using:
-   `uv run scripts/output/pdf_converter.py --input "analysis.json" --output "report.pdf"`
+   `uv run scripts/output/pdf_converter.py --input "output/report.json" --output "output/report.pdf"`
+   
+6. If requested, generate graphs and charts using:
+   `uv run scripts/output/graph_builder.py --input "output/report.json" --output "output/graphs.png"`
 
  #Execution rules
 

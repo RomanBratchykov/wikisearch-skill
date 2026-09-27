@@ -2,7 +2,7 @@ import json
 import matplotlib.pyplot as plt
 import argparse
 
-def build_graph(data: dict, title: str, xlabel: str, ylabel: str, output_file: str) -> None:
+def build_graph(json_data: str, title: str, xlabel: str, ylabel: str, output_file: str) -> None:
     """
     Builds a graph from the given data and saves it to a file.
 
@@ -14,7 +14,11 @@ def build_graph(data: dict, title: str, xlabel: str, ylabel: str, output_file: s
         output_file (str): The path to the output file where the graph will be saved.
     """
 
-    dates = [entry["date"] for entry in data["time_series"]]
+    with open(json_data, "r") as f:
+        data = json.load(f)
+    
+
+    dates = [entry["date"] for entry in data["times_series"]]
     views = [entry["views"] for entry in data["time_series"]]
 
     plt.figure(figsize=(10, 5))

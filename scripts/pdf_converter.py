@@ -4,7 +4,7 @@ import reportlab as rl
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
     
-def convert_to_pdf(data: dict, output_file: str) -> None:
+def convert_to_pdf(json_data: str, output_file: str) -> None:
     """
     Converts the given data to a PDF file.
 
@@ -12,7 +12,8 @@ def convert_to_pdf(data: dict, output_file: str) -> None:
         data (dict): The data to be converted to PDF.
         output_file (str): The path to the output PDF file.
     """
-
+    with open(json_data, "r") as f:
+        data = json.load(f)
     c = canvas.Canvas(output_file, pagesize=letter)
     width, height = letter
 
