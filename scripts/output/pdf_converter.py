@@ -1,6 +1,6 @@
 import argparse
 
-from flask import json
+import json
 import reportlab as rl
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas

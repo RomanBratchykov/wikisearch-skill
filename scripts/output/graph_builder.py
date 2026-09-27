@@ -1,4 +1,4 @@
-from flask import json
+import json
 import matplotlib.pyplot as plt
 import argparse
 

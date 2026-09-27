@@ -50,8 +50,8 @@ uv sync
    - requested output
 
 2. Fetch pageview data using:
-   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --articles "ART1" "ART2" ... --start "YYYY-MM-DD" --end "YYYY-MM-DD" --granularity "daily|monthly" --output "pageviews.json"`
-   Do not manually translate article titles or search for each language
+   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --articles "ART1" "ART2" ... --start "YYYYMMDDHH" --end "YYYYMMDDHH" --granularity "daily|monthly" --output "pageviews.json"`
+    Do not manually translate article titles or search for each language
    separately when the language-link resolver can provide them.
 
 3. Analyze the data using:

@@ -42,14 +42,13 @@ def fetch_data_page(
     article: str,
     start_date: str,
     end_date: str,
-    granularity: str = "monthly",
-    access_token: str = "all-access",
+    granularity: str = "daily",
+    access_token: str = "access",
 )-> dict:
     results = {}
     articles = get_language_articles(article, languages)
     headers = {"User-Agent": "wikisearch-skill/1.0 (https://github.com/RomanBratchykov/wikisearch-skill)"}
-    for lang in languages:
-        for article in articles:
+    for article, lang in articles.items():
             url = ""
             url += (
                 f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
@@ -77,7 +76,7 @@ def fetch_data_page(
     save_to_json(results, "pageviews.json")
     return results
 
-def prepare_data(data: dict) -> dict:
+def prepare_data(data: dict) -> pd.DataFrame:
     analyzed_results = pd.DataFrame(data["items"])
     analyzed_results["date"] = pd.to_datetime(analyzed_results["timestamp"], format="%Y%m%d%H")
     return analyzed_results
@@ -122,7 +121,7 @@ def detect_anomalies(dataframe: pd.DataFrame) -> list[dict]:
         for _, row in anomalies.iterrows()
     ]
     
-def analyze_data(data: dict) -> None:
+def analyze_data(data: dict) -> dict:
     results = {}
     for key, article_data in data.items():
         dataframe = prepare_data(article_data)
@@ -130,9 +129,15 @@ def analyze_data(data: dict) -> None:
         results[key] = {
         "statistics": calculate_statistics(dataframe),
         "anomalies": detect_anomalies(dataframe),
-        "time_series": dataframe[["date", "views"]].to_dict("records"),
+        "time_series": [
+                {
+                    "date": row["date"].isoformat(),
+                    "views": int(row["views"])
+                }
+                for _, row in dataframe[["date", "views"]].iterrows()
+            ],
         }
-    save_to_json(results, "analysis.json")
+    return results
     
 def save_to_json(data: dict, output_file: str = "output.json") -> None:
     with open(output_file, "w") as f:
@@ -144,10 +149,6 @@ def main():
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
-
-    resolve_parser = subparsers.add_parser("resolve")
-    resolve_parser.add_argument("--title", required=True)
-    resolve_parser.add_argument("--languages", nargs="+", required=True)
 
     fetch_parser = subparsers.add_parser("fetch")
     fetch_parser.add_argument("--languages", nargs="+", required=True)
@@ -161,15 +162,8 @@ def main():
     analyze_parser.add_argument("--input", required=True)
     analyze_parser.add_argument("--output", default="analysis.json")
     args = parser.parse_args()
-
-    if args.command == "resolve":
-        result = get_language_articles(
-            args.title,
-            args.languages,
-        )
-        print(json.dumps(result, indent=4, ensure_ascii=False))
-
-    elif args.command == "fetch":
+    
+    if args.command == "fetch":
         result = fetch_data_page(
             args.languages,
             args.articles,
@@ -185,7 +179,6 @@ def main():
         result = analyze_data(data)
         save_to_json(result, args.output)
         print(f"Saved to {args.output}")
-
 
 if __name__ == "__main__":
     main()
