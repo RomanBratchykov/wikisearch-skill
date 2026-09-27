@@ -88,7 +88,7 @@ file should be generated in 'output/report.json'
     - install Python packages or dependencies globally.
     - use the LLM to process large raw datasets when deterministic Python processing is available
     - ask user if agent can check files in system or to create .json, .pdf or .png files in the output folder.
-    ask user if agent can run scripts in the /scripts folder
+    - ask user if agent can run scripts in the /scripts folder
 
   Always use the scripts where possible, and only use the LLM for tasks that cannot be handled by the scripts.
 
