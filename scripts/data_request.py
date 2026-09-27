@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 import pandas as pd
@@ -32,8 +33,8 @@ def get_language_articles(
     articles = {}
 
     for item in data:
-        if item["lang"] in languages:
-            articles[item["lang"]] = item["article"]
+        if item["code"] in languages:
+            articles[item["code"]] = item["title"]
 
     return articles
 
@@ -43,7 +44,7 @@ def fetch_data_page(
     start_date: str,
     end_date: str,
     granularity: str,
-    access_token: str = "access",
+    access_token: str = "all-access",
 )-> dict:
     results = {}
     articles = get_language_articles(article, languages)
@@ -147,46 +148,60 @@ def analyze_data(data: dict) -> dict:
         }
     return results
     
-def save_to_json(data: dict, output_file: str = "output.json") -> None:
+def save_to_json(data: dict, output_file: str = "output/output.json") -> None:
+    os.makedirs("output", exist_ok=True)
     with open(output_file, "w") as f:
         json.dump(data, f, indent=4)
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Wikipedia pageview analysis"
-    )
+    # parser = argparse.ArgumentParser(
+    #     description="Wikipedia pageview analysis"
+    # )
 
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    # subparsers = parser.add_subparsers(dest="command", required=True)
 
-    fetch_parser = subparsers.add_parser("fetch")
-    fetch_parser.add_argument("--languages", nargs="+", required=True)
-    fetch_parser.add_argument("--article", required=True)
-    fetch_parser.add_argument("--start", required=True, help="Start date in YYYYMMDDHH format")
-    fetch_parser.add_argument("--end", required=True, help="End date in YYYYMMDDHH format")
-    fetch_parser.add_argument("--granularity", default="daily")
-    fetch_parser.add_argument("--output", default="pageviews.json")
+    # fetch_parser = subparsers.add_parser("fetch")
+    # fetch_parser.add_argument("--languages", nargs="+", required=True)
+    # fetch_parser.add_argument("--article", required=True)
+    # fetch_parser.add_argument("--start", required=True, help="Start date in YYYYMMDDHH format")
+    # fetch_parser.add_argument("--end", required=True, help="End date in YYYYMMDDHH format")
+    # fetch_parser.add_argument("--granularity", default="daily")
+    # fetch_parser.add_argument("--output", default="pageviews.json")
     
-    analyze_parser = subparsers.add_parser("analyze")
-    analyze_parser.add_argument("--input", required=True)
-    analyze_parser.add_argument("--output", default="analysis.json")
-    args = parser.parse_args()
+    # analyze_parser = subparsers.add_parser("analyze")
+    # analyze_parser.add_argument("--input", required=True)
+    # analyze_parser.add_argument("--output", default="analysis.json")
+    # args = parser.parse_args()
     
-    if args.command == "fetch":
-        result = fetch_data_page(
-            args.languages,
-            args.article,
-            args.start,
-            args.end,
-            args.granularity,
-        )
-        save_to_json(result, args.output)
-        print(f"Saved to {args.output}")
-    elif args.command == "analyze":
-        with open(args.input, "r") as f:
-            data = json.load(f)
-        result = analyze_data(data)
-        save_to_json(result, args.output)
-        print(f"Saved to {args.output}")
+    # if args.command == "fetch":
+    #     result = fetch_data_page(
+    #         args.languages,
+    #         args.article,
+    #         args.start,
+    #         args.end,
+    #         args.granularity,
+    #     )
+    #     save_to_json(result, args.output)
+    #     print(f"Saved to {args.output}")
+    # elif args.command == "analyze":
+    #     with open(args.input, "r") as f:
+    #         data = json.load(f)
+    #     result = analyze_data(data)
+    #     save_to_json(result, args.output)
+    #     print(f"Saved to {args.output}")
+        
+    languages = ["en", "es", "fr", "de", "zh"]
+    article = "Python_(programming_language)"
+    start_date = "20220101"
+    end_date = "20220131"
+
+    data = fetch_data_page(languages, article, start_date, end_date, "daily")
+    print(f"Fetched data for {len(data)} articles.")
+    print(f"Data keys: {list(data.keys())}")
+    print(f"Sample data for {list(data.keys())[0]}: {data[list(data.keys())[0]]['items'][:3]}")
+    analysis = analyze_data(data)
+    save_to_json(analysis, "output/analysis.json")
+    
 
 if __name__ == "__main__":
     main()
