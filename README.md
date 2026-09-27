@@ -7,10 +7,7 @@ PDF report.
 # Installation
 
 use 
-```bash
-curl -fsSL https://raw.githubusercontent.com/RomanBratchykov/wikisearch-skill/install.sh | bash
-```
-or
+
 ```bash
 git clone https://github.com/RomanBratchykov/wikisearch-skill.git
 cd wikisearch-skill
