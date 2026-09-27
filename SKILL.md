@@ -53,22 +53,27 @@ uv sync
    `data_request` implementation.
 
    Use:
-   `get_language_articles()`
+   `uv run scripts/data_request.py resolve --title "ARTICLE_TITLE" --languages "LANG1" "LANG2" ...`
 
    Do not manually translate article titles or search for each language
    separately when the language-link resolver can provide them.
 
 3. Fetch pageview data using:
-   `fetch_data_page()`
+   `uv run scripts/data_request.py fetch --languages "LANG1" "LANG2" ... --articles "ART1" "ART2" ... --start "YYYY-MM-DD" --end "YYYY-MM-DD" --granularity "daily|monthly" --output "pageviews.json"`
 
-4. Analyze the data using:
-   `analyze_data()`
 
-5. If requested, generate graphs and charts using:
-   `generate_graphs()`
+4. Prepare the data using:
+   `uv run scripts/data_request.py prepare --input "analysis.json" --output "prepared_data.json"`
 
-6. If requested, generate a PDF report with summaries and metrics using:
-   `generate_report()`
+
+5. Analyze the data using:
+   `uv run scripts/data_request.py analyze --input "pageviews.json" --output "analysis.json"`
+
+6. If requested, generate graphs and charts using:
+   `uv run scripts/output/graph_builder.py --input "analysis.json" --output "graph.png" --title "Pageviews" --xlabel "Date" --ylabel "Views"`
+
+7. If requested, generate a PDF report with summaries and metrics using:
+   `uv run scripts/output/report_generator.py --input "analysis.json" --output "report.pdf" --title "Wikipedia Pageviews Report"`
 
  #Execution rules
 

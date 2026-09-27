@@ -134,3 +134,65 @@ def save_to_json(data: dict, output_file: str = "output.json") -> None:
     with open(output_file, "w") as f:
         json.dump(data, f, indent=4)
 
+def main():
+    parser = argparse.ArgumentParser(
+        description="Wikipedia pageview analysis"
+    )
+
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    resolve_parser = subparsers.add_parser("resolve")
+    resolve_parser.add_argument("--title", required=True)
+    resolve_parser.add_argument("--languages", nargs="+", required=True)
+
+    fetch_parser = subparsers.add_parser("fetch")
+    fetch_parser.add_argument("--languages", nargs="+", required=True)
+    fetch_parser.add_argument("--articles", nargs="+", required=True)
+    fetch_parser.add_argument("--start", required=True)
+    fetch_parser.add_argument("--end", required=True)
+    fetch_parser.add_argument("--granularity", default="monthly")
+    fetch_parser.add_argument("--output", default="pageviews.json")
+    
+    analyze_parser = subparsers.add_parser("analyze")
+    analyze_parser.add_argument("--input", required=True)
+    analyze_parser.add_argument("--output", default="analysis.json")
+    
+    prepare_parser = subparsers.add_parser("prepare")
+    prepare_parser.add_argument("--input", required=True)
+    prepare_parser.add_argument("--output", default="prepared_data.json")
+
+    args = parser.parse_args()
+
+    if args.command == "resolve":
+        result = get_language_articles(
+            args.title,
+            args.languages,
+        )
+        print(json.dumps(result, indent=4, ensure_ascii=False))
+
+    elif args.command == "fetch":
+        result = fetch_data_page(
+            args.languages,
+            args.articles,
+            args.start,
+            args.end, 
+            args.granularity,
+        )
+        save_to_json(result, args.output)
+        print(f"Saved to {args.output}")
+    elif args.command == "analyze":
+        with open(args.input, "r") as f:
+            data = json.load(f)
+        result = analyze_data(data)
+        save_to_json(result, args.output)
+        print(f"Saved to {args.output}")
+    elif args.command == "prepare":
+        with open(args.input, "r") as f:
+            data = json.load(f)
+        result = prepare_data(data)
+        save_to_json(result.to_dict("records"), args.output)
+        print(f"Saved to {args.output}")
+
+
+if __name__ == "__main__":
+    main()
